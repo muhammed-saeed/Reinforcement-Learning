@@ -1,6 +1,8 @@
 import numpy as np
 
 class Environment(object):
+    #The idea is to use Deep Reinforcement Learning Techniques to reduce the cost of datacenter, measuring the level of humidity, number of users and many other features
+    #then choose the best action accordingly
     #introducing and installing all the parameters and variables
     def __init__(self, optimal_temperature = (18.0, 24.0), initial_month = 0, initial_number_users = 10, initial_rate_data = 60):
         self.monthly_atmospheric_temperature = [1.0, 5.0, 7.0, 10.0, 11.0, 20.0, 23.0, 24.0, 22.0, 10.0, 5.0, 1.0]
@@ -28,7 +30,7 @@ class Environment(object):
         self.game_over = 0
         self.train = 1
 
-    #making a method that update the Envrionment right after the ai plays an action
+    #making a method that update the Envrionment right after the AI agent plays an action
     def update_env(self, direction, energy_ai, month):
         #the energy spent by the AI that changes the server's temperature from Ti to Ti+1 within 1 unit time
         #can be approximated again
@@ -54,14 +56,14 @@ class Environment(object):
         elif (self.current_number_users < self.min_number_users):
             self.current_number_users = self.min_number_users
 
-        #update the data rate
+        #update the rate of the data 
         self.current_rate_data += np.random.randint(-self.max_rate_data, self.max_rate_data)
         if(self.current_rate_data >  self.max_rate_data):
             self.current_rate_data = self.max_rate_data
         elif(self.current_rate_data < self.min_rate_data):
             self.current_rate_data = self.min_rate_data
 
-        #compute the change of the intrinsic_temperature
+        #calculate the change of the intrinsic_temperature
         past_intrinsic_temperature = self.intrinsic_temperature
         self.intrinsic_temperature = self.atmospheric_temperature + 1.25 * self.current_number_users + 1.25 * self.current_rate_data
         #note the above line of code contains both the new number of users and also the new
@@ -89,12 +91,12 @@ class Environment(object):
                 self.temperature_ai = self.optimal_temperature[1]
                 self.total_energy_ai += self.temperature_ai - self.optimal_temperature[1]
 
-        #updating the total energy spent by the AI
+        #update the total energy spent by the AI
         self.total_energy_ai += energy_ai
-        #updating the total energy used by the server when there is no ai
+        #update the total energy used by the server when there is no ai
         self.total_energy_noai += energy_noai
 
-        #SCALING THE NEXT STATE
+       
         scaled_temperature_ai = (self.temperature_ai - self.min_temperature) /(self.max_temperature - self.min_temperature)
         scaled_number_users = (self.current_number_users - self.min_number_users)/(self.max_number_users - self.min_number_users)
         scaled_rate_data = (self.current_rate_data - self.min_rate_data)/(self.max_rate_data - self.min_rate_data)
@@ -102,7 +104,7 @@ class Environment(object):
 
         return next_state, self.reward, self.game_over
 
-    #making a method that resets the Envrionment
+    #the reset function as its name indicates it resets the envrionment
     def reset(self,new_month):
         self.atmospheric_temperature = self.monthly_atmospheric_temperature[new_month]
         self.initial_month = new_month
@@ -117,7 +119,7 @@ class Environment(object):
         self.game_over = 0
         self.train = 1
 
-    #making method that observse the Envrionment
+    #observe method sense environment - MDP - and get the required obseravations which form the state
     def observe(self):
         scaled_temperature_ai = (self.temperature_ai - self.min_temperature) /(self.max_temperature - self.min_temperature)
         scaled_number_users = (self.current_number_users - self.min_number_users)/(self.max_number_users - self.min_number_users)
